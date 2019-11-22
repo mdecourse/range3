@@ -25,7 +25,6 @@ void RRARequestWorker::availableSoftware(void)
     RRARequestInput *pInput = RRARequestInput::requestLatestSoftwareVersion();
     this->requestType = pInput->getType();
     this->execute(pInput);
-    delete pInput;
 }
 
 void RRARequestWorker::logIn(const QString &account, const QString &password)
@@ -33,7 +32,6 @@ void RRARequestWorker::logIn(const QString &account, const QString &password)
     RRARequestInput *pInput = RRARequestInput::logIn(account,password);
     this->requestType = pInput->getType();
     this->execute(pInput);
-    delete pInput;
 }
 
 void RRARequestWorker::logOut(const QString &account)
@@ -41,7 +39,6 @@ void RRARequestWorker::logOut(const QString &account)
     RRARequestInput *pInput = RRARequestInput::logOut(account);
     this->requestType = pInput->getType();
     this->execute(pInput);
-    delete pInput;
 }
 
 void RRARequestWorker::sendUsageInfo(const QString &usageInfo)
@@ -49,7 +46,13 @@ void RRARequestWorker::sendUsageInfo(const QString &usageInfo)
     RRARequestInput *pInput = RRARequestInput::sendUsageInfo(usageInfo);
     this->requestType = pInput->getType();
     this->execute(pInput);
-    delete pInput;
+}
+
+void RRARequestWorker::sendCrashReport(const QString &crashReport)
+{
+    RRARequestInput *pInput = RRARequestInput::sendCrashReport(crashReport);
+    this->requestType = pInput->getType();
+    this->execute(pInput);
 }
 
 void RRARequestWorker::onHttpRequestFinished(void)
@@ -144,9 +147,9 @@ void RRARequestWorker::onHttpRequestFinished(void)
             emit this->usage(QString(html),responseMessages);
             return;
         }
-        default:
+        case RRARequestInput::SEND_CRASH_REPORT:
         {
-            emit this->failed(this->requestType,tr("Unknown RRA type."));
+            emit this->crashReport(QString(html),responseMessages);
             return;
         }
     }
