@@ -38,6 +38,7 @@ void RGLDisplayProperties::_init(const RGLDisplayProperties *pDisplayProperties)
         this->drawLocalAxis = pDisplayProperties->drawLocalAxis;
         this->showModelEdges = pDisplayProperties->showModelEdges;
         this->showModelDimensions = pDisplayProperties->showModelDimensions;
+        this->showModelGrid = pDisplayProperties->showModelGrid;
         this->showErrors = pDisplayProperties->showErrors;
         this->bgColor = pDisplayProperties->bgColor;
         this->bgGradient = pDisplayProperties->bgGradient;
@@ -50,10 +51,11 @@ RGLDisplayProperties::RGLDisplayProperties()
     , drawLocalAxis(true)
     , showModelEdges(true)
     , showModelDimensions(true)
+    , showModelGrid(false)
     , showErrors(true)
     , bgGradient(true)
 {
-    this->bgColor = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0).dark();
+    this->bgColor = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0).darker();
     this->lights.resize(2);
     this->lights[0].setEnabled(true);
     this->lights[0].setAmbient(QColor("#191919"));
@@ -129,6 +131,16 @@ void RGLDisplayProperties::setShowModelDimensions(bool showModelDimensions)
     this->showModelDimensions = showModelDimensions;
 }
 
+bool RGLDisplayProperties::getShowModelGrid(void) const
+{
+    return this->showModelGrid;
+}
+
+void RGLDisplayProperties::setShowModelGrid(bool showModelGrid)
+{
+    this->showModelGrid = showModelGrid;
+}
+
 bool RGLDisplayProperties::getShowErrors(void) const
 {
     return this->showErrors;
@@ -161,17 +173,17 @@ void RGLDisplayProperties::setBgGradient(bool bgGradient)
 
 uint RGLDisplayProperties::getNLights(void) const
 {
-    return (uint)this->lights.size();
+    return uint(this->lights.size());
 }
 
 void RGLDisplayProperties::setNLights(uint nLights)
 {
     R_ERROR_ASSERT(nLights < 8);
 
-    this->lights.resize(nLights);
+    this->lights.resize(int(nLights));
     for (uint i=0;i<nLights;i++)
     {
-        this->lights[i].setLightNumber(lightNums[i]);
+        this->lights[int(i)].setLightNumber(lightNums[i]);
     }
 }
 
@@ -179,21 +191,21 @@ const RGLLight &RGLDisplayProperties::getLight(uint lightID) const
 {
     R_ERROR_ASSERT(lightID < this->getNLights());
 
-    return this->lights[lightID];
+    return this->lights[int(lightID)];
 }
 
 RGLLight &RGLDisplayProperties::getLight(uint lightID)
 {
     R_ERROR_ASSERT(lightID < this->getNLights());
 
-    return this->lights[lightID];
+    return this->lights[int(lightID)];
 }
 
 void RGLDisplayProperties::setLight(uint lightID, const RGLLight &glLight)
 {
     R_ERROR_ASSERT(lightID < this->getNLights());
 
-    this->lights[lightID] = glLight;
+    this->lights[int(lightID)] = glLight;
 }
 
 void RGLDisplayProperties::read(const QString &fileName)

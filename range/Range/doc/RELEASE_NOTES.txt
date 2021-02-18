@@ -1,4 +1,32 @@
 ------------------------------------------------------------------
+Version 3.2.5
+
+* ALL: Added support for MacOS
+* GUI: Added command line option '--reset-defaults' which resets all settings to their default values
+* GUI: Added 3D area mouse action help
+* GUI: Show model grid
+* GUI: Changed mouse action buttons and key modifiers in 3D area
+
+Bug fixes:
+
+* GUI: Picking elements and nodes can produce invalid results
+
+------------------------------------------------------------------
+Version 3.2.4
+
+* GUI: Configurable toolbar icon size
+* GUI: Display time required to draw model in 3D area
+* GUI: Added 'Cancel' push button to drawing widget which removes all objects at once
+* GUI: Newly drawn objects are shown as transparent
+* GUI: Draw circle/ellipse: United position and direction widgets into one input widget
+
+Bug fixes:
+
+* SOLVER: New values for monitoring points overwrite instead of append
+* GUI: Crash when performing boolean operations
+* GUI: Fixed invalid scaling on Linux High DPI Displays
+
+------------------------------------------------------------------
 Version 3.2.3
 
 * GUI: Detect and report application crash

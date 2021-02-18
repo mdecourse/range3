@@ -1,8 +1,8 @@
 version: 2
 jobs:
-  build-centos7:
+  build-centos:
     docker:
-      - image: centos:centos7
+      - image: centos:latest
     steps:
       - checkout
       - run:
@@ -14,9 +14,9 @@ jobs:
       - run:
           name: Upload
           command: scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -P $UPLOAD_PORT build-Release/packages/rpmbuild/RPMS/$(uname -m)/*.rpm $UPLOAD_USER@$UPLOAD_HOST:.
-  build-fedora30:
+  build-fedora33:
     docker:
-      - image: fedora:30
+      - image: fedora:33
     steps:
       - checkout
       - run:
@@ -28,9 +28,9 @@ jobs:
       - run:
           name: Upload
           command: scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -P $UPLOAD_PORT build-Release/packages/rpmbuild/RPMS/$(uname -m)/*.rpm $UPLOAD_USER@$UPLOAD_HOST:.
-  build-opensuseleap:
+  build-opensusetumbleweed:
     docker:
-      - image: opensuse/leap
+      - image: opensuse/tumbleweed
     steps:
       - checkout
       - run:
@@ -42,9 +42,9 @@ jobs:
       - run:
           name: Upload
           command: scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -P $UPLOAD_PORT build-Release/packages/rpmbuild/RPMS/$(uname -m)/*.rpm $UPLOAD_USER@$UPLOAD_HOST:.
-  build-debian9:
+  build-debian10:
     docker:
-      - image: debian:9
+      - image: debian:10
     steps:
       - checkout
       - run:
@@ -59,9 +59,9 @@ jobs:
       - run:
           name: Upload
           command: scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -P $UPLOAD_PORT *.deb $UPLOAD_USER@$UPLOAD_HOST:.
-  build-ubuntu1804:
+  build-ubuntu2010:
     docker:
-      - image: ubuntu:bionic
+      - image: ubuntu:20.10
     steps:
       - checkout
       - run:
@@ -80,8 +80,8 @@ workflows:
   version: 2
   build_all:
     jobs:
-      - build-centos7
-      - build-fedora30
-      - build-opensuseleap
-      - build-debian9
-      - build-ubuntu1804
+      - build-fedora33
+      - build-opensusetumbleweed
+      - build-ubuntu2010
+#      - build-centos
+#      - build-debian10

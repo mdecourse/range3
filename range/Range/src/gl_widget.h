@@ -32,6 +32,8 @@ class GLWidget : public QOpenGLWidget
         static const GLsizei lAxisWpWidth;
         //! Local axis viewport height.
         static const GLsizei lAxisWpHeight;
+        //! Desktop device pixel ratio.
+        int desktopDevicePixelRatio;
 
     protected:
 
@@ -107,6 +109,8 @@ class GLWidget : public QOpenGLWidget
         QFont font;
         //! Use GL_CULL_FACE
         bool useGlCullFace;
+        //! Model draw time in milliseconds;
+        qint64 modelDrawTime;
 
     public:
 

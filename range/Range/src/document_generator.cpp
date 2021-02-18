@@ -15,6 +15,8 @@
 #include <QTextTable>
 #include <QHostInfo>
 #include <QPainter>
+#include <QPageSize>
+#include <QMarginsF>
 
 #include <rblib.h>
 
@@ -30,8 +32,8 @@ DocumentGenerator::DocumentGenerator(QObject *parent)
     this->docFooter = new QTextDocument(this);
     this->docBody = new QTextDocument(this);
     this->printer = new QPrinter(QPrinter::ScreenResolution);
-    this->printer->setPageSize(QPrinter::A4);
-    this->printer->setPageMargins(20.0,15.0,20.0,10.0,QPrinter::Millimeter);
+    this->printer->setPageSize(QPageSize(QPageSize::A4));
+    this->printer->setPageMargins(QMarginsF(20.0,15.0,20.0,10.0),QPageLayout::Millimeter);
 }
 
 void DocumentGenerator::setEnableHeaderCounters(bool enableHeaderCounters)
@@ -84,10 +86,6 @@ void DocumentGenerator::run(void)
                     this->exportToPDF(iter.value());
                     break;
                 }
-                default:
-                {
-                    throw RError(R_ERROR_APPLICATION,R_ERROR_REF,"Unsupported file type \'%d\'",int(iter.key()));
-                }
             }
         }
         RLogger::notice("Documents have been generated.");
@@ -106,18 +104,25 @@ void DocumentGenerator::generate(void)
     RLogger::info("Generating document.\n");
     RLogger::indent();
 
-    this->docHeader->setPageSize(this->printer->pageRect().size());
+    QColor mColor(Qt::black);
+    QString style = QString("color: rgb(%1,%2,%3);").arg(mColor.red()).arg(mColor.green()).arg(mColor.blue());
+    this->docTitle->setDefaultStyleSheet(style);
+    this->docHeader->setDefaultStyleSheet(style);
+    this->docBody->setDefaultStyleSheet(style);
+    this->docFooter->setDefaultStyleSheet(style);
+
+    QRect pageRect(this->printer->pageLayout().paintRectPixels(this->printer->resolution()));
+    this->docHeader->setPageSize(pageRect.size());
 
     this->generateHeader();
 
-    this->docFooter->setPageSize(this->printer->pageRect().size());
+    this->docFooter->setPageSize(pageRect.size());
 
     this->generateFooter();
 
-    this->docTitle->setPageSize(this->printer->pageRect().size());
+    this->docTitle->setPageSize(pageRect.size());
     // Calculating the main document size for one page
-    QSizeF centerSize(this->printer->pageRect().width(),
-                      this->printer->pageRect().height() - this->docHeader->size().toSize().height() - this->docFooter->size().toSize().height());
+    QSizeF centerSize(pageRect.width(),pageRect.height() - this->docHeader->size().toSize().height() - this->docFooter->size().toSize().height());
     this->docBody->setPageSize(centerSize);
     this->docBody->setIndentWidth(10.0);
 
@@ -208,10 +213,10 @@ void DocumentGenerator::exportToPDF(const QString &fileName) const
     QPainter painter(this->printer);
 
     // Drawing the title
-    painter.resetMatrix();
+    painter.resetTransform();
     painter.translate(0, this->docTitle->pageSize().height()/2.0 - titleRect.height());
     this->docTitle->drawContents(&painter,titleRect);
-    painter.resetMatrix();
+    painter.resetTransform();
     // Drawing the header on the top of the page
     this->docHeader->drawContents(&painter, headerRect);
 
@@ -222,7 +227,7 @@ void DocumentGenerator::exportToPDF(const QString &fileName) const
     while (currentRect.intersects(contentRect))
     {
         // Resetting the painter matrix co ordinate system.
-        painter.resetMatrix();
+        painter.resetTransform();
         // Applying negative translation of painter co-ordinate system by current main content rectangle top y coordinate.
         painter.translate(0, -currentRect.y());
         // Applying positive translation of painter co-ordinate system by header hight.
@@ -230,7 +235,7 @@ void DocumentGenerator::exportToPDF(const QString &fileName) const
         // Drawing the center content for current page.
         this->docBody->drawContents(&painter, currentRect);
         // Resetting the painter matrix co ordinate system.
-        painter.resetMatrix();
+        painter.resetTransform();
         // Drawing the header on the top of the page
         this->docHeader->drawContents(&painter, headerRect);
         // Applying positive translation of painter co-ordinate system to draw the footer

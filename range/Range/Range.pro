@@ -1,17 +1,31 @@
-QT += core gui opengl printsupport network
+QT += core gui opengl printsupport network widgets
+
+equals(QT_MAJOR_VERSION, 6) {
+    QT += openglwidgets
+}
+
 win*-msvc* {
     QMAKE_CXXFLAGS += -openmp
     LIB_EXT = "lib"
     LIB_PRE = ""
 } else {
-    QMAKE_CXXFLAGS += -fopenmp
-    LIBS += -fopenmp
+    macx: {
+        QMAKE_CXXFLAGS += -Xpreprocessor -fopenmp -I/usr/local/include
+        LIBS += -lomp -L /usr/local/lib
+    } else {
+        QMAKE_CXXFLAGS += -fopenmp
+        LIBS += -fopenmp
+    }
     LIB_EXT = "a"
     LIB_PRE = "lib"
 
-    CONFIG += link_pkgconfig
-    PKGCONFIG += libavutil libavformat libswscale
+    !win* {
+        CONFIG += link_pkgconfig
+        PKGCONFIG += libavutil libavformat libswscale
+    }
 }
+
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x050F00
 
 TARGET = Range
 TEMPLATE = app
@@ -91,6 +105,7 @@ SOURCES += \
     src/gl_entity.cpp \
     src/gl_entity_list.cpp \
     src/gl_functions.cpp \
+    src/gl_grid.cpp \
     src/gl_interpolated_element.cpp \
     src/gl_interpolated_entity.cpp \
     src/gl_line.cpp \
@@ -118,6 +133,7 @@ SOURCES += \
     src/help_actions_widget.cpp \
     src/help_center_dialog.cpp \
     src/help_general_widget.cpp \
+    src/help_gl_action_event_widget.cpp \
     src/help_tips_widget.cpp \
     src/help_tutorial_widget.cpp \
     src/http_request_input.cpp \
@@ -129,6 +145,7 @@ SOURCES += \
     src/job_manager.cpp \
     src/keyboard_shortcuts_edit.cpp \
     src/light_properties_widget.cpp \
+    src/local_direction_widget.cpp \
     src/locker.cpp \
     src/log_browser.cpp \
     src/log_browser_dialog.cpp \
@@ -298,6 +315,7 @@ HEADERS += \
     src/gl_entity.h \
     src/gl_entity_list.h \
     src/gl_functions.h \
+    src/gl_grid.h \
     src/gl_interpolated_element.h \
     src/gl_interpolated_entity.h \
     src/gl_line.h \
@@ -325,6 +343,7 @@ HEADERS += \
     src/help_actions_widget.h \
     src/help_center_dialog.h \
     src/help_general_widget.h \
+    src/help_gl_action_event_widget.h \
     src/help_tips_widget.h \
     src/help_tutorial_widget.h \
     src/http_request_input.h \
@@ -336,6 +355,7 @@ HEADERS += \
     src/job_manager.h \
     src/keyboard_shortcuts_edit.h \
     src/light_properties_widget.h \
+    src/local_direction_widget.h \
     src/locker.h \
     src/log_browser.h \
     src/log_browser_dialog.h \
@@ -443,7 +463,7 @@ CONFIG(debug, debug|release) {
     CONFIG += console
 }
 
-win*-msvc* {
+win* {
     LIBS += \
         -L../../ffmpeg/ffmpeg-3.4.1-win64/bin/ \
         -L../../ffmpeg/ffmpeg-3.4.1-win64/lib/
@@ -488,4 +508,7 @@ RESOURCES += \
     range.qrc
 
 win32:RC_ICONS += pixmaps/range.ico
-
+macx: {
+    ICON = pixmaps/range.icns
+    BUNDLEIDENTIFIER = com.range-software.Range
+}

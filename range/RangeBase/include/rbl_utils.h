@@ -28,8 +28,8 @@ namespace RVendor
     static const QString author("Tomáš Šoltys");
     static const QString email("tomas.soltys@range-software.com");
     static const QString www("https://www.range-software.com");
-    static const RVersion version(3,2,3,RVersion::Release);
-    static const short year = 2019;
+    static const RVersion version(3,2,5,RVersion::Release);
+    static const short year = 2020;
 }
 
 namespace RConstants
@@ -52,6 +52,7 @@ namespace RConstants
 #define R_SAME_SIGN(_v1,_v2) (_v2 > 0.0 ? std::fabs(_v1) : -std::fabs(_v1))
 #define R_IS_IN_CLOSED_INTERVAL(_l1,_l2,_v) (_l1 <= _v && _l2 >= _v)
 #define R_IS_IN_OPEN_INTERVAL(_l1,_l2,_v) (_l1 < _v && _l2 > _v)
+#define R_D_ARE_SAME(_v1,_v2) (std::fabs((_v1)-(_v2)) < RConstants::eps)
 
 namespace RUtil
 {
@@ -95,6 +96,28 @@ namespace RUtil
         return arg * pow(10 , -(*exp));
     }
 
+
+    inline int findExponent(double value)
+    {
+        int exp = 0;
+
+        if (std::abs(value) < 1.0)
+        {
+            while (std::abs(value)/std::pow(10.0,exp) < 1)
+            {
+                exp--;
+            }
+        }
+        else
+        {
+            while (std::abs(value)/std::pow(10.0,exp) >= 10)
+            {
+                exp ++;
+            }
+        }
+
+        return exp;
+    }
 } // RUtil
 
 #endif /* RBL_MACROS_H */
